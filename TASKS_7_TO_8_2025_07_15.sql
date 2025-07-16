@@ -31,6 +31,7 @@ COMMIT;
 -- i)I used import data functionality to load records from a CSV file into the Asset_Register 
 
 --ii)CREATE TABLE asset_register_links FROM ASSET _REGISTER
+     --here all Data is copied from table asset_register-(note:It will not copy constraints automatically.)
 CREATE TABLE Asset_Register_Links AS
 SELECT *FROM ASSET_REGISTER;
 
