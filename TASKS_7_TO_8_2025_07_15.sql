@@ -106,6 +106,7 @@ ON (
 WHEN NOT MATCHED THEN
   INSERT (stock_id, stock_code, asset_type, description)
   VALUES (source.stock_id, source.stock_code, 'SEDOL', source.description);
+
 -- CHECK OUTPUT 
 select * from asset_register_links
 where stock_id=1;
