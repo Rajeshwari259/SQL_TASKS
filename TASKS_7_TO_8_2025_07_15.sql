@@ -64,3 +64,47 @@ insert into asset_register_links values (-1018,'INF090I01808','Franklin India Fe
 insert into asset_register_links values (-1019,'INF247L01536','Motilal Oswal Nasdaq 100 ETF - Feeder â€“ US Index','ISIN');
 insert into asset_register_links values (-1020,'INF223J01AL3','PGIM India Global Equity Opp Fund - Dir Growth - Global Equity','ISIN');
 COMMIT;
+
+CREATE TABLE asset_linking_lookup(
+  isin   VARCHAR2(30),
+  cusip  VARCHAR2(30),
+  sedol  VARCHAR2(30)
+);
+--INSERT CUSIP
+MERGE INTO asset_register_links target
+USING (
+  SELECT al.cusip AS stock_code,
+         ar.stock_id,
+         ar.description
+  FROM asset_linking_lookup al
+  JOIN asset_register_links ar
+    ON al.isin = ar.stock_code AND ar.asset_type = 'ISIN'
+  WHERE al.cusip IS NOT NULL
+) source
+ON (
+  target.stock_code = source.stock_code AND target.ASSET_type = 'CUSIP'
+)
+WHEN NOT MATCHED THEN
+  INSERT (stock_id, stock_code, ASSET_type, description)
+  VALUES (source.stock_id, source.stock_code, 'CUSIP', source.description);
+
+--INSERT SEDOL
+MERGE INTO asset_register_links target
+USING (
+  SELECT al.sedol AS stock_code,
+         ar.stock_id,
+         ar.description
+  FROM asset_linking_lookup al
+  JOIN asset_register_links ar
+    ON al.isin = ar.stock_code AND ar.asset_type = 'ISIN'
+  WHERE al.sedol IS NOT NULL
+) source
+ON (
+  target.stock_code = source.stock_code AND target.asset_type = 'SEDOL'
+)
+WHEN NOT MATCHED THEN
+  INSERT (stock_id, stock_code, asset_type, description)
+  VALUES (source.stock_id, source.stock_code, 'SEDOL', source.description);
+-- CHECK OUTPUT 
+select * from asset_register_links
+where stock_id=1;
